@@ -58,6 +58,20 @@ flyctl deploy
 fly.io 멀티머신(2대) 환경에서 rate limit 카운터가 머신별로 분리될 수 있는 점은 알려진
 트레이드오프로 허용합니다(가용성 우선).
 
+## 실측 확인 사항
+
+- `get_vilage_fcst`의 `numOfRows` 기본값은 1000으로 설정(예제 응답 totalCount 742~944건 실측
+  확인, 기본값 10이면 잘림)
+- `dataType=JSON` 에러 응답은 실제로 JSON 형식으로 옴(잘못된 nx/ny 요청 시 `resultCode: "10"`
+  JSON 정상 수신 확인). 단, 만약을 대비해 XML `<resultCode>`/`<resultMsg>` 정규식 폴백도 구현됨
+- `get_vilage_fcst`에 유효하지 않은 base_time(예: 03시)을 지정하면 `resultCode: "03"`
+  (NO_DATA) 에러가 반환됨(빈 응답이 아닌 명시적 에러)
+- 단기예보 +4일 이후(연장기간) PCP/SNO/WSD는 정성정보 코드(1=적음/2=보통/3=많음)로 옴을
+  실측 확인. 서버는 `baseDate` 대비 `fcstDate`가 +4일 이상이면 이 코드표를 적용하고
+  응답에 `is_extended_period: true`를 표시함
+- `get_fcst_version`은 `basedatetime`을 `base_time`과 동일한 `YYYYMMDDHHmm` 형식으로 주면
+  정상 동작 확인(ftype=SHRT 기준)
+
 ## 라이선스
 
 MIT
